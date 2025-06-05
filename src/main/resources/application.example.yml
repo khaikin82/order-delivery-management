@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: delivery-management-app
+  profiles:
+    active: dev  # Hoặc "prod" khi deploy lên production
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+
+jwt:
+  secret: jwt_secret
+

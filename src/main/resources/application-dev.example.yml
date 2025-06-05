@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/delivery_management
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true        # Hiển thị log SQL khi phát triển
+    properties:
+      hibernate:
+        format_sql: true   # Định dạng SQL đẹp khi log (chỉ nên bật trong dev)
+
+server:
+  address: 0.0.0.0
+  port: 8080
+
+logging:
+  level:
+    root: INFO # Mức log mặc định
+    com.khaikin: DEBUG # Ghi log chi tiết cho package của bạn
