@@ -1,7 +1,7 @@
 package com.khaikin.delivery.service;
 
-import com.khaikin.delivery.dto.CreateOrderRequest;
-import com.khaikin.delivery.dto.OrderResponse;
+import com.khaikin.delivery.dto.order.CreateOrderRequest;
+import com.khaikin.delivery.dto.order.OrderResponse;
 import com.khaikin.delivery.entity.enums.OrderStatus;
 
 import java.util.List;

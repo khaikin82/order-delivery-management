@@ -1,4 +1,4 @@
-package com.khaikin.delivery.dto;
+package com.khaikin.delivery.dto.order;
 
 import lombok.Data;
 

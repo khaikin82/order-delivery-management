@@ -1,8 +1,8 @@
 package com.khaikin.delivery.service.impl;
 
 import jakarta.transaction.Transactional;
-import com.khaikin.delivery.dto.UserDto;
-import com.khaikin.delivery.dto.UserUpdateDto;
+import com.khaikin.delivery.dto.user.UserDto;
+import com.khaikin.delivery.dto.user.UserUpdateDto;
 import com.khaikin.delivery.entity.User;
 import com.khaikin.delivery.exception.ResourceNotFoundException;
 import com.khaikin.delivery.repository.UserRepository;

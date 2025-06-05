@@ -3,11 +3,11 @@ spring:
     name: qrest-management-app
   profiles:
     active: dev  # Hoặc "prod" khi deploy lên production
-#  sql:
-#    init:
-#      mode: always
-#      schema-locations: classpath:schema.sql
-#      data-locations: classpath:data.sql
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
 
 jwt:
   secret: 88252e1a16925e84fcf8e7680722807df9ff10722b4689f2662f0932791316f2

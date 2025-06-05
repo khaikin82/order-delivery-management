@@ -1,7 +1,6 @@
-package com.khaikin.delivery.dto;
+package com.khaikin.delivery.dto.user;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data

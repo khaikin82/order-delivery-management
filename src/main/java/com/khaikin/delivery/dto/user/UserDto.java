@@ -1,4 +1,4 @@
-package com.khaikin.delivery.dto;
+package com.khaikin.delivery.dto.user;
 
 import com.khaikin.delivery.entity.enums.Role;
 import lombok.Data;

@@ -1,15 +1,18 @@
 package com.khaikin.delivery.service.impl;
 
-import com.khaikin.delivery.dto.CreateOrderRequest;
-import com.khaikin.delivery.dto.OrderResponse;
+import com.khaikin.delivery.dto.order.CreateOrderRequest;
+import com.khaikin.delivery.dto.order.OrderResponse;
 import com.khaikin.delivery.entity.Order;
+import com.khaikin.delivery.entity.OrderStatusHistory;
 import com.khaikin.delivery.entity.User;
 import com.khaikin.delivery.entity.enums.OrderStatus;
 import com.khaikin.delivery.exception.ConflictException;
 import com.khaikin.delivery.exception.ResourceNotFoundException;
 import com.khaikin.delivery.repository.OrderRepository;
+import com.khaikin.delivery.repository.OrderStatusHistoryRepository;
 import com.khaikin.delivery.repository.UserRepository;
 import com.khaikin.delivery.service.OrderService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -27,6 +30,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final OrderStatusHistoryRepository orderStatusHistoryRepository;
 
 
     @Override
@@ -91,6 +95,7 @@ public class OrderServiceImpl implements OrderService {
         return mapToResponse(saved);
     }
 
+    @Transactional
     @Override
     public OrderResponse updateOrder(Long orderId, CreateOrderRequest request, String username) {
         Order order = orderRepository.findById(orderId)
@@ -111,6 +116,7 @@ public class OrderServiceImpl implements OrderService {
         return mapToResponse(updatedOrder);
     }
 
+    @Transactional
     @Override
     public OrderResponse updateStatus(Long orderId, OrderStatus newStatus, String username) {
         Order order = orderRepository.findById(orderId)
@@ -123,7 +129,14 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(newStatus);
         order.setUpdatedAt(LocalDateTime.now());
 
+        OrderStatusHistory history = new OrderStatusHistory();
+        history.setOrder(order);
+        history.setStatus(newStatus);
+        history.setUpdatedAt(LocalDateTime.now());
+        history.setUpdatedBy(username);
+
         Order saved = orderRepository.save(order);
+        orderStatusHistoryRepository.save(history);
         log.info("Order {} status updated to {} by {}", orderId, newStatus, username);
 
         return mapToResponse(saved);

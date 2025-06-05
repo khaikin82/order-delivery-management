@@ -1,9 +1,8 @@
 package com.khaikin.delivery.controller;
 
-import com.khaikin.delivery.dto.CreateOrderRequest;
-import com.khaikin.delivery.dto.OrderResponse;
+import com.khaikin.delivery.dto.order.CreateOrderRequest;
+import com.khaikin.delivery.dto.order.OrderResponse;
 import com.khaikin.delivery.entity.enums.OrderStatus;
-import jakarta.validation.Valid;
 import com.khaikin.delivery.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;

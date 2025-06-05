@@ -1,10 +1,10 @@
 package com.khaikin.delivery.controller;
 
 import com.khaikin.delivery.config.JwtService;
-import com.khaikin.delivery.dto.AuthRequest;
-import com.khaikin.delivery.dto.AuthResponse;
-import com.khaikin.delivery.dto.ChangePasswordRequest;
-import com.khaikin.delivery.dto.RegisterRequest;
+import com.khaikin.delivery.dto.auth.AuthRequest;
+import com.khaikin.delivery.dto.auth.AuthResponse;
+import com.khaikin.delivery.dto.auth.ChangePasswordRequest;
+import com.khaikin.delivery.dto.auth.RegisterRequest;
 import com.khaikin.delivery.entity.User;
 import com.khaikin.delivery.service.AuthService;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         User user = authService.register(request.getUsername(), request.getPassword(), request.getRole());
         String token = jwtService.generateToken(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token));
+        return new ResponseEntity<>(new AuthResponse(token), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")

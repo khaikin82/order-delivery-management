@@ -1,4 +1,4 @@
-package com.khaikin.delivery.dto;
+package com.khaikin.delivery.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

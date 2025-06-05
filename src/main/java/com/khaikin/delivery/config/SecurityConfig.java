@@ -1,10 +1,12 @@
 package com.khaikin.delivery.config;
 
+import com.khaikin.delivery.entity.enums.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,10 +38,33 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                                               .requestMatchers("/api/v1/auth/**", "/**", "/swagger-ui/**").permitAll()
-//                        .requestMatchers("/api/**").hasRole("ADMIN")
-//                        .requestMatchers("/api/v1/combos/**").hasRole("USER")
-                                               .anyRequest().authenticated()
+                        // Cho phép truy cập không cần token
+                        .requestMatchers(
+                                "/api/v1/auth/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
+
+                        // User
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(Role.ADMIN.name())
+
+                        // Order
+                        .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasRole(Role.CUSTOMER.name())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/my").hasRole(Role.CUSTOMER.name())
+                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.PUT, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
+                        .requestMatchers("/api/v1/orders/**/assign").hasRole(Role.ADMIN.name())
+                        .requestMatchers("/api/v1/orders/**/status").hasRole(Role.DELIVERY_STAFF.name())
+
+                        // Tracking
+                        .requestMatchers("/api/v1/tracking/**").hasAnyRole(Role.CUSTOMER.name(), Role.ADMIN.name())
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
@@ -47,11 +72,14 @@ public class SecurityConfig {
                 .build();
     }
 
-
     @Bean
     public JwtDecoder jwtDecoder() {
         // Dùng NimbusJwtDecoder với secret key
+        if (jwtSecret.isBlank()) {
+            throw new IllegalArgumentException("JWT secret must not be empty");
+        }
         byte[] secretKey = jwtSecret.getBytes();
+
         return NimbusJwtDecoder.withSecretKey(new SecretKeySpec(secretKey, "HmacSHA256")).build();
     }
 

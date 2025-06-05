@@ -2,8 +2,8 @@ package com.khaikin.delivery.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
-import com.khaikin.delivery.dto.UserDto;
-import com.khaikin.delivery.dto.UserUpdateDto;
+import com.khaikin.delivery.dto.user.UserDto;
+import com.khaikin.delivery.dto.user.UserUpdateDto;
 import com.khaikin.delivery.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
