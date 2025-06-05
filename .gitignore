@@ -31,3 +31,10 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Bỏ qua file cấu hình
+src/main/resources/application.yml
+src/main/resources/application-dev.yml
+src/main/resources/application-prod.yml
+
+
