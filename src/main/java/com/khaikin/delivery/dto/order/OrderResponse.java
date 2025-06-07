@@ -1,9 +1,11 @@
 package com.khaikin.delivery.dto.order;
 
+import com.khaikin.delivery.dto.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.entity.enums.OrderStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class OrderResponse {
@@ -25,4 +27,7 @@ public class OrderResponse {
 
     private String customerUsername;
     private String deliveryStaffUsername;
+
+    private List<OrderTrackingHistoryResponse> trackingHistory;
+
 }

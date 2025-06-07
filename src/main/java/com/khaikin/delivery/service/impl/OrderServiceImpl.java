@@ -3,19 +3,21 @@ package com.khaikin.delivery.service.impl;
 import com.khaikin.delivery.dto.order.CreateOrderRequest;
 import com.khaikin.delivery.dto.order.OrderResponse;
 import com.khaikin.delivery.entity.Order;
-import com.khaikin.delivery.entity.OrderStatusHistory;
 import com.khaikin.delivery.entity.User;
 import com.khaikin.delivery.entity.enums.OrderStatus;
+import com.khaikin.delivery.event.OrderStatusChangedEvent;
 import com.khaikin.delivery.exception.ConflictException;
 import com.khaikin.delivery.exception.ResourceNotFoundException;
 import com.khaikin.delivery.repository.OrderRepository;
-import com.khaikin.delivery.repository.OrderStatusHistoryRepository;
+import com.khaikin.delivery.repository.OrderTrackingHistoryRepository;
 import com.khaikin.delivery.repository.UserRepository;
 import com.khaikin.delivery.service.OrderService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -30,7 +32,7 @@ public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    private final OrderStatusHistoryRepository orderStatusHistoryRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
 
     @Override
@@ -130,20 +132,21 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "orderId", orderId));
 
         if (order.getDeliveryStaff() == null || !order.getDeliveryStaff().getUsername().equals(username)) {
-            throw new ConflictException("You are not assigned to this order.");
+            throw new AuthorizationDeniedException("You are not assigned to this order.");
         }
+
+        OrderStatus oldStatus = order.getStatus();
 
         order.setStatus(newStatus);
         order.setUpdatedAt(LocalDateTime.now());
-
-        OrderStatusHistory history = new OrderStatusHistory();
-        history.setOrder(order);
-        history.setStatus(newStatus);
-        history.setUpdatedAt(LocalDateTime.now());
-        history.setUpdatedBy(username);
-
         Order saved = orderRepository.save(order);
-        orderStatusHistoryRepository.save(history);
+
+        // Publish event
+        OrderStatusChangedEvent event = new OrderStatusChangedEvent(
+                this, orderId, oldStatus, newStatus, username
+        );
+        eventPublisher.publishEvent(event);
+
         log.info("Order {} status updated to {} by {}", orderId, newStatus, username);
 
         return mapToResponse(saved);

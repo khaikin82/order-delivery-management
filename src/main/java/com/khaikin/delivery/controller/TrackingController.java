@@ -1,6 +1,6 @@
 package com.khaikin.delivery.controller;
 
-import com.khaikin.delivery.dto.OrderStatusHistoryDto;
+import com.khaikin.delivery.dto.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.service.TrackingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,8 +18,8 @@ public class TrackingController {
     private final TrackingService trackingService;
 
     @GetMapping("/{orderCode}")
-    public ResponseEntity<List<OrderStatusHistoryDto>> getTrackingInfo(@PathVariable String orderCode) {
-        List<OrderStatusHistoryDto> history = trackingService.getTrackingHistory(orderCode);
+    public ResponseEntity<List<OrderTrackingHistoryResponse>> getTrackingInfo(@PathVariable String orderCode) {
+        List<OrderTrackingHistoryResponse> history = trackingService.getTrackingHistory(orderCode);
         return ResponseEntity.ok(history);
     }
 }

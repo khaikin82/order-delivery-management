@@ -1,5 +1,5 @@
 -- Drop tables if they exist (in reverse order of dependencies)
-DROP TABLE IF EXISTS order_status_history;
+DROP TABLE IF EXISTS order_tracking_history;
 DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS users;
 
@@ -36,11 +36,11 @@ CREATE TABLE orders (
     CONSTRAINT fk_staff FOREIGN KEY (staff_id) REFERENCES users(id)
 );
 
-CREATE TABLE order_status_history (
+CREATE TABLE order_tracking_history (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     order_id BIGINT,
     status ENUM('CREATED', 'ASSIGNED', 'PICKED_UP', 'IN_TRANSIT', 'DELIVERED', 'COMPLETED', 'CANCELLED') NOT NULL,
-    updated_at DATETIME,
-    updated_by VARCHAR(255),
+    changed_at DATETIME NOT NULL,
+    changed_by VARCHAR(255) NOT NULL,
     CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );

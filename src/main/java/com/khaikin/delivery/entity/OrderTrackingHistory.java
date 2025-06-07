@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-public class OrderStatusHistory {
+@Table(name = "order_tracking_history")
+public class OrderTrackingHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,8 +24,8 @@ public class OrderStatusHistory {
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
 
-    private LocalDateTime updatedAt;
+    private LocalDateTime changedAt;
 
-    private String updatedBy;
+    private String changedBy;
 
 }

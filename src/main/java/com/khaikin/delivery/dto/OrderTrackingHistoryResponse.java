@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderStatusHistoryDto {
+public class OrderTrackingHistoryResponse {
     private OrderStatus status;
-    private LocalDateTime updatedAt;
-    private String updatedBy;
+    private LocalDateTime changedAt;
+    private String changedBy;
 }
