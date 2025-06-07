@@ -2,8 +2,10 @@ package com.khaikin.delivery.controller;
 
 import com.khaikin.delivery.dto.order.CreateOrderRequest;
 import com.khaikin.delivery.dto.order.OrderResponse;
+import com.khaikin.delivery.dto.tracking.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.entity.enums.OrderStatus;
 import com.khaikin.delivery.service.OrderService;
+import com.khaikin.delivery.service.TrackingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 @Validated
 public class OrderController {
     private final OrderService orderService;
+    private final TrackingService trackingService;
 
     // Lấy danh sách tất cả đơn hàng
     @GetMapping
@@ -41,6 +44,12 @@ public class OrderController {
     public ResponseEntity<OrderResponse> getOrderByCode(@PathVariable String orderCode) {
         OrderResponse order = orderService.getOrderByCode(orderCode);
         return ResponseEntity.ok(order);
+    }
+
+    @GetMapping("/{orderCode}/tracking")
+    public ResponseEntity<List<OrderTrackingHistoryResponse>> getTrackingInfo(@PathVariable String orderCode) {
+        List<OrderTrackingHistoryResponse> history = trackingService.getTrackingHistory(orderCode);
+        return ResponseEntity.ok(history);
     }
 
     @GetMapping("/my")
@@ -93,6 +102,7 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/assign")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> assignOrder(
             @PathVariable Long id,
             @RequestParam String staffUsername) {

@@ -23,9 +23,12 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.UUID;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,7 +89,10 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
         log.info("Order {} created by user {}", savedOrder.getOrderCode(), username);
-        eventPublisher.publishEvent(new OrderCreatedEvent(order.getOrderCode(), customer.getEmail()));
+//        eventPublisher.publishEvent(new OrderCreatedEvent(order.getOrderCode(), customer.getEmail()));
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this, savedOrder.getId(), null, savedOrder.getStatus(), username
+        ));
 
         return mapToResponse(savedOrder);
     }
@@ -147,10 +153,9 @@ public class OrderServiceImpl implements OrderService {
         Order saved = orderRepository.save(order);
 
         // Publish event
-        OrderStatusChangedEvent event = new OrderStatusChangedEvent(
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
                 this, orderId, oldStatus, newStatus, username
-        );
-        eventPublisher.publishEvent(event);
+        ));
 
         log.info("Order {} status updated to {} by {}", orderId, newStatus, username);
 
@@ -166,10 +171,35 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-
     private String generateOrderCode() {
-        return "ORD" + UUID.randomUUID().toString().replace("-", "").substring(0, 10).toUpperCase();
+        String datePart = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+
+        // Đếm số order hôm nay → bạn cần query DB, ở đây tạm giả lập:
+        long countToday = orderRepository.countByCreatedAtBetween(
+                LocalDate.now().atStartOfDay(),
+                LocalDate.now().plusDays(1).atStartOfDay()
+        );
+
+        long nextOrderNumber = countToday + 1;
+        String orderNumberPart = String.format("%04d", nextOrderNumber); // padding 3 số: 001, 002,...
+        String randomPart = generateRandomAlphaNumeric(4); // 4 ký tự random
+
+        return "ORD" + datePart + orderNumberPart + randomPart;
     }
+
+    private String generateRandomAlphaNumeric(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+        StringBuilder sb = new StringBuilder();
+        Random random = new SecureRandom(); // dùng SecureRandom cho an toàn hơn
+
+        for (int i = 0; i < length; i++) {
+            int index = random.nextInt(chars.length());
+            sb.append(chars.charAt(index));
+        }
+
+        return sb.toString();
+    }
+
 
     private OrderResponse mapToResponse(Order order) {
         OrderResponse response = modelMapper.map(order, OrderResponse.class);
