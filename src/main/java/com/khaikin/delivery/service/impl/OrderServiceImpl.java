@@ -1,12 +1,13 @@
 package com.khaikin.delivery.service.impl;
 
-import com.khaikin.delivery.dto.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.dto.order.CreateOrderRequest;
 import com.khaikin.delivery.dto.order.OrderResponse;
+import com.khaikin.delivery.dto.tracking.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.entity.Order;
 import com.khaikin.delivery.entity.OrderTrackingHistory;
 import com.khaikin.delivery.entity.User;
 import com.khaikin.delivery.entity.enums.OrderStatus;
+import com.khaikin.delivery.event.OrderCreatedEvent;
 import com.khaikin.delivery.event.OrderStatusChangedEvent;
 import com.khaikin.delivery.exception.ConflictException;
 import com.khaikin.delivery.exception.ResourceNotFoundException;
@@ -35,7 +36,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
-//    private final OrderTrackingHistoryRepository historyRepository;
+    private final OrderTrackingHistoryRepository historyRepository;
 
 
     @Override
@@ -85,6 +86,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
         log.info("Order {} created by user {}", savedOrder.getOrderCode(), username);
+        eventPublisher.publishEvent(new OrderCreatedEvent(order.getOrderCode(), customer.getEmail()));
 
         return mapToResponse(savedOrder);
     }
@@ -134,9 +136,9 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "orderId", orderId));
 
-        if (order.getDeliveryStaff() == null || !order.getDeliveryStaff().getUsername().equals(username)) {
-            throw new AuthorizationDeniedException("You are not assigned to this order.");
-        }
+//        if (order.getDeliveryStaff() == null || !order.getDeliveryStaff().getUsername().equals(username)) {
+//            throw new AuthorizationDeniedException("You are not assigned to this order.");
+//        }
 
         OrderStatus oldStatus = order.getStatus();
 
@@ -176,13 +178,13 @@ public class OrderServiceImpl implements OrderService {
         response.setCustomerUsername(order.getCustomer() != null ? order.getCustomer().getUsername() : null);
         response.setDeliveryStaffUsername(order.getDeliveryStaff() != null ? order.getDeliveryStaff().getUsername() : null);
 
-//        List<OrderTrackingHistory> history =
-//                historyRepository.findByOrderOrderCodeOrderByChangedAtAsc(order.getOrderCode());
-//
-//        List<OrderTrackingHistoryResponse> historyResponse = history.stream()
-//                .map(h -> modelMapper.map(h, OrderTrackingHistoryResponse.class))
-//                .toList();
-//        response.setTrackingHistory(historyResponse);
+        List<OrderTrackingHistory> history =
+                historyRepository.findByOrderOrderCodeOrderByChangedAtAsc(order.getOrderCode());
+
+        List<OrderTrackingHistoryResponse> historyResponse = history.stream()
+                .map(h -> modelMapper.map(h, OrderTrackingHistoryResponse.class))
+                .toList();
+        response.setTrackingHistory(historyResponse);
         return response;
     }
 }

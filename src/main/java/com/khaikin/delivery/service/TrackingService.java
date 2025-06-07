@@ -1,6 +1,6 @@
 package com.khaikin.delivery.service;
 
-import com.khaikin.delivery.dto.OrderTrackingHistoryResponse;
+import com.khaikin.delivery.dto.tracking.OrderTrackingHistoryResponse;
 
 import java.util.List;
 

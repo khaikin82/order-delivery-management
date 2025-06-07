@@ -1,4 +1,4 @@
-package com.khaikin.delivery.dto;
+package com.khaikin.delivery.dto.tracking;
 
 import com.khaikin.delivery.entity.enums.OrderStatus;
 import lombok.AllArgsConstructor;

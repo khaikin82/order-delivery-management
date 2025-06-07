@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class OrderStatusChangedListener {
+public class OrderStatusChangedEventListener {
 
     private final OrderTrackingHistoryRepository trackingHistoryRepository;
     private final OrderRepository orderRepository;

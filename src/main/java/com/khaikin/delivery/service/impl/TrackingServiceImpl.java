@@ -1,6 +1,6 @@
 package com.khaikin.delivery.service.impl;
 
-import com.khaikin.delivery.dto.OrderTrackingHistoryResponse;
+import com.khaikin.delivery.dto.tracking.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.entity.OrderTrackingHistory;
 import com.khaikin.delivery.repository.OrderRepository;
 import com.khaikin.delivery.repository.OrderTrackingHistoryRepository;

@@ -1,6 +1,6 @@
 package com.khaikin.delivery.dto.order;
 
-import com.khaikin.delivery.dto.OrderTrackingHistoryResponse;
+import com.khaikin.delivery.dto.tracking.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.entity.enums.OrderStatus;
 import lombok.Data;
 

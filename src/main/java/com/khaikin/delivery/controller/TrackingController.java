@@ -1,6 +1,6 @@
 package com.khaikin.delivery.controller;
 
-import com.khaikin.delivery.dto.OrderTrackingHistoryResponse;
+import com.khaikin.delivery.dto.tracking.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.service.TrackingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
