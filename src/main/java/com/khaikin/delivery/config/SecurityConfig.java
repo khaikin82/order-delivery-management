@@ -44,26 +44,28 @@ public class SecurityConfig {
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
                                 "/swagger-resources/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api/v1/**"
                         ).permitAll()
 
                         // User
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(Role.ADMIN.name())
+//                        .requestMatchers(HttpMethod.GET, "/api/v1/users/**").hasRole(Role.ADMIN.name())
+//                        .requestMatchers(HttpMethod.PUT, "/api/v1/users/**").hasRole(Role.ADMIN.name())
+//                        .requestMatchers(HttpMethod.DELETE, "/api/v1/users/**").hasRole(Role.ADMIN.name())
+//                        .requestMatchers(HttpMethod.GET, "/api/v1/users").hasRole(Role.ADMIN.name())
 
                         // Order
                         .requestMatchers(HttpMethod.POST, "/api/v1/orders").hasRole(Role.CUSTOMER.name())
                         .requestMatchers(HttpMethod.GET, "/api/v1/orders/my").hasRole(Role.CUSTOMER.name())
-                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.PUT, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
-                        .requestMatchers("/api/v1/orders/**/assign").hasRole(Role.ADMIN.name())
+//                        .requestMatchers(HttpMethod.GET, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
+//                        .requestMatchers(HttpMethod.PUT, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
+//                        .requestMatchers(HttpMethod.DELETE, "/api/v1/orders/**").hasRole(Role.ADMIN.name())
+//                        .requestMatchers("/api/v1/orders/**/assign").hasRole(Role.ADMIN.name())
                         .requestMatchers("/api/v1/orders/**/status").hasRole(Role.DELIVERY_STAFF.name())
 
                         // Tracking
                         .requestMatchers("/api/v1/tracking/**").hasAnyRole(Role.CUSTOMER.name(), Role.ADMIN.name())
+                        .requestMatchers("/api/v1/**").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

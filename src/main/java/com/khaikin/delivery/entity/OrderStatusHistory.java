@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 public class OrderStatusHistory {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,5 +25,6 @@ public class OrderStatusHistory {
 
     private LocalDateTime updatedAt;
 
-    private String updatedBy; // email/username người cập nhật (Customer/DeliveryStaff/Admin)
+    private String updatedBy;
+
 }

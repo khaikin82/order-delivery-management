@@ -37,6 +37,12 @@ public class OrderController {
         return ResponseEntity.ok(order);
     }
 
+    @GetMapping("/code/{orderCode}")
+    public ResponseEntity<OrderResponse> getOrderByCode(@PathVariable String orderCode) {
+        OrderResponse order = orderService.getOrderByCode(orderCode);
+        return ResponseEntity.ok(order);
+    }
+
     @GetMapping("/my")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<OrderResponse>> getMyOrders(Authentication authentication) {
