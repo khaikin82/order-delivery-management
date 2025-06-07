@@ -1,14 +1,17 @@
 -- Tạo user (3 khách hàng, 3 nhân viên giao hàng, 1 admin)
-INSERT INTO users (username, password, email, phone, role) VALUES
-('customer1', 'pass1', 'cus1@example.com', '0901000001', 'CUSTOMER'),
-('customer2', 'pass2', 'cus2@example.com', '0901000002', 'CUSTOMER'),
-('customer3', 'pass3', 'cus3@example.com', '0901000003', 'CUSTOMER'),
+INSERT INTO users (username, password, email, phone, full_name, role) VALUES
+-- Customers
+('customer1', 'pass1', 'cus1@example.com', '0901000001', 'Nguyen Van A', 'CUSTOMER'),
+('customer2', 'pass2', 'cus2@example.com', '0901000002', 'Tran Thi B', 'CUSTOMER'),
+('customer3', 'pass3', 'cus3@example.com', '0901000003', 'Le Hoang C', 'CUSTOMER'),
 
-('staff1', 'staffpass1', 'staff1@example.com', '0911000001', 'DELIVERY_STAFF'),
-('staff2', 'staffpass2', 'staff2@example.com', '0911000002', 'DELIVERY_STAFF'),
-('staff3', 'staffpass3', 'staff3@example.com', '0911000003', 'DELIVERY_STAFF'),
+-- Delivery Staff
+('staff1', 'staffpass1', 'staff1@example.com', '0911000001', 'Pham Van D', 'DELIVERY_STAFF'),
+('staff2', 'staffpass2', 'staff2@example.com', '0911000002', 'Hoang Thi E', 'DELIVERY_STAFF'),
+('staff3', 'staffpass3', 'staff3@example.com', '0911000003', 'Do Quang F', 'DELIVERY_STAFF'),
 
-('admin', 'adminpass', 'admin@example.com', '0999999999', 'ADMIN');
+-- Admin
+('admin', 'adminpass', 'admin@example.com', '0999999999', 'Nguyen Thi G', 'ADMIN');
 
 
 INSERT INTO orders (

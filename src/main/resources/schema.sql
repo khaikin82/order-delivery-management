@@ -4,13 +4,13 @@ DROP TABLE IF EXISTS orders;
 DROP TABLE IF EXISTS users;
 
 
-
 CREATE TABLE users (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(255),
     phone VARCHAR(20),
+    full_name VARCHAR(255),
     role ENUM('CUSTOMER', 'DELIVERY_STAFF', 'ADMIN') NOT NULL
 );
 

@@ -1,8 +1,10 @@
 package com.khaikin.delivery.service.impl;
 
+import com.khaikin.delivery.dto.OrderTrackingHistoryResponse;
 import com.khaikin.delivery.dto.order.CreateOrderRequest;
 import com.khaikin.delivery.dto.order.OrderResponse;
 import com.khaikin.delivery.entity.Order;
+import com.khaikin.delivery.entity.OrderTrackingHistory;
 import com.khaikin.delivery.entity.User;
 import com.khaikin.delivery.entity.enums.OrderStatus;
 import com.khaikin.delivery.event.OrderStatusChangedEvent;
@@ -33,6 +35,7 @@ public class OrderServiceImpl implements OrderService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final ApplicationEventPublisher eventPublisher;
+//    private final OrderTrackingHistoryRepository historyRepository;
 
 
     @Override
@@ -173,6 +176,13 @@ public class OrderServiceImpl implements OrderService {
         response.setCustomerUsername(order.getCustomer() != null ? order.getCustomer().getUsername() : null);
         response.setDeliveryStaffUsername(order.getDeliveryStaff() != null ? order.getDeliveryStaff().getUsername() : null);
 
+//        List<OrderTrackingHistory> history =
+//                historyRepository.findByOrderOrderCodeOrderByChangedAtAsc(order.getOrderCode());
+//
+//        List<OrderTrackingHistoryResponse> historyResponse = history.stream()
+//                .map(h -> modelMapper.map(h, OrderTrackingHistoryResponse.class))
+//                .toList();
+//        response.setTrackingHistory(historyResponse);
         return response;
     }
 }
