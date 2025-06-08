@@ -1,5 +1,6 @@
 package com.khaikin.delivery.service.impl;
 
+import com.khaikin.delivery.dto.auth.RegisterRequest;
 import com.khaikin.delivery.entity.User;
 import com.khaikin.delivery.entity.enums.Role;
 import com.khaikin.delivery.exception.BadRequestException;
@@ -21,7 +22,12 @@ public class AuthServiceImpl implements AuthService {
     private final ModelMapper modelMapper;
 
     @Override
-    public User register(String username, String password, Role role) {
+    public User register(RegisterRequest request) {
+        String username = request.getUsername();
+        String password = request.getPassword();
+        Role role = request.getRole();
+        String fullName = request.getFullName();
+        String email = request.getEmail();
         if (userRepository.findByUsername(username).isPresent())
             throw new ConflictException("A user with username '" + username + "' already exists.");
 
@@ -33,6 +39,8 @@ public class AuthServiceImpl implements AuthService {
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .role(role)
+                .fullName(fullName)
+                .email(email)
                 .build();
         return userRepository.save(user);
     }
