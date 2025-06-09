@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.Components;
 
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -41,5 +42,21 @@ public class OpenApiConfig {
                                                                 .scheme("bearer")
                                                                 .bearerFormat("JWT")))
                 .addSecurityItem(new io.swagger.v3.oas.models.security.SecurityRequirement().addList("bearerAuth"));
+    }
+
+    @Bean
+    public GroupedOpenApi apiV1Group() {
+        return GroupedOpenApi.builder()
+                .group("v1") // tên group hiện trên Swagger UI
+                .pathsToMatch("/api/v1/**") // chỉ quét các endpoint v1
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi apiV2Group() {
+        return GroupedOpenApi.builder()
+                .group("v2") // tên group hiện trên Swagger UI
+                .pathsToMatch("/api/v2/**") // chỉ quét các endpoint v2
+                .build();
     }
 }

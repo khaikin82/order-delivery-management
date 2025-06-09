@@ -6,11 +6,13 @@ import com.khaikin.delivery.dto.user.UserDto;
 import com.khaikin.delivery.dto.user.UserUpdateDto;
 import com.khaikin.delivery.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -20,8 +22,12 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    public ResponseEntity<Page<UserDto>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
     }
 
     @GetMapping("/{id}")
@@ -31,8 +37,12 @@ public class UserController {
 
 
     @GetMapping("/delivery-staff")
-    public ResponseEntity<List<UserDto>> getAllStaffs() {
-        return ResponseEntity.ok(userService.getAllStaffs());
+    public ResponseEntity<Page<UserDto>> getAllStaffs(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return ResponseEntity.ok(userService.getAllStaffs(pageable));
     }
 
     @GetMapping("/email/{email}")

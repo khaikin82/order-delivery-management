@@ -4,15 +4,15 @@ package com.khaikin.delivery.service;
 import com.khaikin.delivery.dto.user.UserDto;
 import com.khaikin.delivery.dto.user.UserUpdateDto;
 import com.khaikin.delivery.entity.enums.Role;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface UserService {
-    List<UserDto> getAllUsers();
+    Page<UserDto> getAllUsers(Pageable pageable);
     UserDto getUserById(Long userId);
     UserDto getUserByEmail(String email);
     UserDto updateUser(Long userId, UserUpdateDto userUpdateDto);
     void deleteUserById(Long userId);
-    List<UserDto> getAllUsersByRole(Role role);
-    List<UserDto> getAllStaffs();
+    Page<UserDto> getAllUsersByRole(Role role, Pageable pageable);
+    Page<UserDto> getAllStaffs(Pageable pageable);
 }

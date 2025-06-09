@@ -9,6 +9,10 @@ import com.khaikin.delivery.service.OrderService;
 import com.khaikin.delivery.service.TrackingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,11 +32,14 @@ public class OrderController {
     private final OrderService orderService;
     private final TrackingService trackingService;
 
-    // Lấy danh sách tất cả đơn hàng
     @GetMapping
-    public ResponseEntity<List<OrderResponse>> getAllOrders() {
-        List<OrderResponse> orders = orderService.getAllOrders();
-        return ResponseEntity.ok(orders);
+    public ResponseEntity<Page<OrderResponse>> getAllOrders(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<OrderResponse> orderPage = orderService.getAllOrders(pageable);
+        return ResponseEntity.ok(orderPage);
     }
 
     @GetMapping("/{id}")
@@ -55,19 +62,33 @@ public class OrderController {
 
     @GetMapping("/my")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<OrderResponse>> getMyOrders(Authentication authentication) {
+    public ResponseEntity<Page<OrderResponse>> getMyOrders(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         String username = authentication.getName();
-        List<OrderResponse> orders = orderService.getMyOrders(username);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending()); // bạn có thể chỉnh sort theo field mong muốn
+
+        Page<OrderResponse> orders = orderService.getMyOrders(username, pageable);
+
         return ResponseEntity.ok(orders);
     }
 
+
     @GetMapping("/staff/my")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<List<OrderResponse>> getMyStaffOrders(Authentication authentication) {
+    public ResponseEntity<Page<OrderResponse>> getMyStaffOrders(
+            Authentication authentication,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
         String username = authentication.getName();
-        List<OrderResponse> orders = orderService.getMyStaffOrders(username);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        Page<OrderResponse> orders = orderService.getMyStaffOrders(username, pageable);
         return ResponseEntity.ok(orders);
     }
+
 
     @PostMapping
     @PreAuthorize("isAuthenticated()")

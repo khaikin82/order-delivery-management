@@ -20,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -43,11 +45,10 @@ public class OrderServiceImpl implements OrderService {
 
 
     @Override
-    public List<OrderResponse> getAllOrders() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+        System.out.println(orderRepository.findAll(pageable));
+        return orderRepository.findAll(pageable)
+                .map(this::mapToResponse);
     }
 
     @Override
@@ -64,25 +65,23 @@ public class OrderServiceImpl implements OrderService {
         return mapToResponse(order);
     }
 
+
     @Override
-    public List<OrderResponse> getMyOrders(String username) {
+    public Page<OrderResponse> getMyOrders(String username, Pageable pageable) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        List<Order> orders = orderRepository.findByCustomer(user);
-        return orders.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        Page<Order> orders = orderRepository.findByCustomer(user, pageable);
+        return orders.map(this::mapToResponse);
     }
 
     @Override
-    public List<OrderResponse> getMyStaffOrders(String staffUsername) {
+    public Page<OrderResponse> getMyStaffOrders(String staffUsername, Pageable pageable) {
         User user = userRepository.findByUsername(staffUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("Staff", "username", staffUsername));
-        List<Order> orders = orderRepository.findByDeliveryStaff(user);
-        return orders.stream()
-                .map(this::mapToResponse)
-                .collect(Collectors.toList());
+        Page<Order> ordersPage = orderRepository.findByDeliveryStaff(user, pageable);
+        return ordersPage.map(this::mapToResponse);
     }
+
 
     @Override
     public OrderResponse createOrder(CreateOrderRequest request, String username) {

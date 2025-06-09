@@ -3,14 +3,14 @@ package com.khaikin.delivery.service;
 import com.khaikin.delivery.dto.order.CreateOrderRequest;
 import com.khaikin.delivery.dto.order.OrderResponse;
 import com.khaikin.delivery.entity.enums.OrderStatus;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 
 public interface OrderService {
-    List<OrderResponse> getAllOrders();
-    List<OrderResponse> getMyOrders(String username);
-    List<OrderResponse> getMyStaffOrders(String staffUsername);
+    Page<OrderResponse> getAllOrders(Pageable pageable);
+    Page<OrderResponse> getMyOrders(String username, Pageable pageable);
+    Page<OrderResponse> getMyStaffOrders(String staffUsername, Pageable pageable);
     OrderResponse getOrderById(Long id);
     OrderResponse getOrderByCode(String orderCode);
 

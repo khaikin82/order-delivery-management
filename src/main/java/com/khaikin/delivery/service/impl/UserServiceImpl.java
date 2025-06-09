@@ -10,6 +10,8 @@ import com.khaikin.delivery.repository.UserRepository;
 import com.khaikin.delivery.service.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,11 +24,11 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
 
     @Override
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream()
-                .map(user -> modelMapper.map(user, UserDto.class))
-                .collect(Collectors.toList());
+    public Page<UserDto> getAllUsers(Pageable pageable) {
+        Page<User> usersPage = userRepository.findAll(pageable);
+        return usersPage.map(user -> modelMapper.map(user, UserDto.class));
     }
+
 
     @Override
     public UserDto getUserById(Long userId) {
@@ -61,15 +63,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> getAllUsersByRole(Role role) {
-        return userRepository.findAllByRole(role).stream()
-                .map(user -> modelMapper.map(user, UserDto.class))
-                .collect(Collectors.toList());
+    public Page<UserDto> getAllUsersByRole(Role role, Pageable pageable) {
+        Page<User> usersPage = userRepository.findAllByRole(role, pageable);
+        return usersPage.map(user -> modelMapper.map(user, UserDto.class));
     }
 
+
     @Override
-    public List<UserDto> getAllStaffs() {
-        return getAllUsersByRole(Role.DELIVERY_STAFF);
+    public Page<UserDto> getAllStaffs(Pageable pageable) {
+        return getAllUsersByRole(Role.DELIVERY_STAFF, pageable);
     }
+
 
 }
