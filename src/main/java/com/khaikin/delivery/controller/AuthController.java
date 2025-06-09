@@ -25,14 +25,14 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request) {
         User user = authService.register(request);
         String token = jwtService.generateToken(user);
-        return new ResponseEntity<>(new AuthResponse(token), HttpStatus.CREATED);
+        return new ResponseEntity<>(new AuthResponse(user.getUsername(), token), HttpStatus.CREATED);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
         User user = authService.authenticate(request.getUsername(), request.getPassword());
         String token = jwtService.generateToken(user);
-        return ResponseEntity.ok(new AuthResponse(token));
+        return ResponseEntity.ok(new AuthResponse(user.getUsername(), token));
     }
 
     @PutMapping("/change-password")

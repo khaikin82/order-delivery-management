@@ -75,6 +75,16 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderResponse> getMyStaffOrders(String staffUsername) {
+        User user = userRepository.findByUsername(staffUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff", "username", staffUsername));
+        List<Order> orders = orderRepository.findByDeliveryStaff(user);
+        return orders.stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public OrderResponse createOrder(CreateOrderRequest request, String username) {
         User customer = userRepository.findByUsername(username)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
@@ -106,11 +116,33 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("Staff", "username", staffUsername));
 
         order.setDeliveryStaff(staff);
-        order.setStatus(OrderStatus.ASSIGNED);
+        if (order.getStatus() == OrderStatus.CREATED) {
+            order.setStatus(OrderStatus.ASSIGNED);
+        }
         order.setUpdatedAt(LocalDateTime.now());
 
         Order saved = orderRepository.save(order);
-        log.info("Order {} assigned to staff {}", orderId, staffUsername);
+        log.info("Order with orderId {} assigned to staff {}", orderId, staffUsername);
+
+        return mapToResponse(saved);
+    }
+
+    @Override
+    public OrderResponse assignOrder(String orderCode, String staffUsername) {
+        Order order = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "orderCode", orderCode));
+
+        User staff = userRepository.findByUsername(staffUsername)
+                .orElseThrow(() -> new ResourceNotFoundException("Staff", "username", staffUsername));
+
+        order.setDeliveryStaff(staff);
+        if (order.getStatus() == OrderStatus.CREATED) {
+            order.setStatus(OrderStatus.ASSIGNED);
+        }
+        order.setUpdatedAt(LocalDateTime.now());
+
+        Order saved = orderRepository.save(order);
+        log.info("Order with orderCode {} assigned to staff {}", orderCode, staffUsername);
 
         return mapToResponse(saved);
     }
@@ -142,9 +174,9 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "orderId", orderId));
 
-//        if (order.getDeliveryStaff() == null || !order.getDeliveryStaff().getUsername().equals(username)) {
-//            throw new AuthorizationDeniedException("You are not assigned to this order.");
-//        }
+        if (order.getDeliveryStaff() == null || !order.getDeliveryStaff().getUsername().equals(username)) {
+            throw new AuthorizationDeniedException("You are not assigned to this order.");
+        }
 
         OrderStatus oldStatus = order.getStatus();
 
@@ -157,7 +189,32 @@ public class OrderServiceImpl implements OrderService {
                 this, orderId, oldStatus, newStatus, username
         ));
 
-        log.info("Order {} status updated to {} by {}", orderId, newStatus, username);
+        log.info("Order with orderId {} status updated to {} by {}", orderId, newStatus, username);
+
+        return mapToResponse(saved);
+    }
+
+    @Override
+    public OrderResponse updateStatus(String orderCode, OrderStatus newStatus, String username) {
+        Order order = orderRepository.findByOrderCode(orderCode)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", "orderCode", orderCode));
+
+        if (order.getDeliveryStaff() == null || !order.getDeliveryStaff().getUsername().equals(username)) {
+            throw new AuthorizationDeniedException("You are not assigned to this order.");
+        }
+
+        OrderStatus oldStatus = order.getStatus();
+
+        order.setStatus(newStatus);
+        order.setUpdatedAt(LocalDateTime.now());
+        Order saved = orderRepository.save(order);
+
+        // Publish event
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this, order.getId(), oldStatus, newStatus, username
+        ));
+
+        log.info("Order with orderCode {} status updated to {} by {}", orderCode, newStatus, username);
 
         return mapToResponse(saved);
     }

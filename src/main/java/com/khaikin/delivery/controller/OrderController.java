@@ -1,5 +1,6 @@
 package com.khaikin.delivery.controller;
 
+import com.khaikin.delivery.dto.order.AssignStaffRequest;
 import com.khaikin.delivery.dto.order.CreateOrderRequest;
 import com.khaikin.delivery.dto.order.OrderResponse;
 import com.khaikin.delivery.dto.tracking.OrderTrackingHistoryResponse;
@@ -60,6 +61,14 @@ public class OrderController {
         return ResponseEntity.ok(orders);
     }
 
+    @GetMapping("/staff/my")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<OrderResponse>> getMyStaffOrders(Authentication authentication) {
+        String username = authentication.getName();
+        List<OrderResponse> orders = orderService.getMyStaffOrders(username);
+        return ResponseEntity.ok(orders);
+    }
+
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<OrderResponse> createOrder(
@@ -101,16 +110,26 @@ public class OrderController {
         return ResponseEntity.ok(updated);
     }
 
-    @PostMapping("/{id}/assign")
+    @PutMapping("/by-id/{id}/assign")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> assignOrder(
             @PathVariable Long id,
-            @RequestParam String staffUsername) {
-        OrderResponse assigned = orderService.assignOrder(id, staffUsername);
+            @RequestBody AssignStaffRequest request) {
+        OrderResponse assigned = orderService.assignOrder(id, request.getStaffUsername());
         return ResponseEntity.ok(assigned);
     }
 
-    @PostMapping("/{id}/status")
+    @PutMapping("/by-code/{orderCode}/assign")
+//    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<OrderResponse> assignOrder(
+            @PathVariable String orderCode,
+            @RequestBody AssignStaffRequest request) {
+        OrderResponse assigned = orderService.assignOrder(orderCode, request.getStaffUsername());
+        return ResponseEntity.ok(assigned);
+    }
+
+    @PutMapping("/by-id/{id}/status")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<OrderResponse> updateStatus(
             @PathVariable Long id,
@@ -118,6 +137,17 @@ public class OrderController {
             Authentication authentication) {
         String username = authentication.getName();
         OrderResponse updated = orderService.updateStatus(id, status, username);
+        return ResponseEntity.ok(updated);
+    }
+
+    @PutMapping("/by-code/{orderCode}/status")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<OrderResponse> updateStatus(
+            @PathVariable String orderCode,
+            @RequestParam OrderStatus status,
+            Authentication authentication) {
+        String username = authentication.getName();
+        OrderResponse updated = orderService.updateStatus(orderCode, status, username);
         return ResponseEntity.ok(updated);
     }
 

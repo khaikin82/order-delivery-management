@@ -1,5 +1,6 @@
 package com.khaikin.delivery.service.impl;
 
+import com.khaikin.delivery.entity.enums.Role;
 import jakarta.transaction.Transactional;
 import com.khaikin.delivery.dto.user.UserDto;
 import com.khaikin.delivery.dto.user.UserUpdateDto;
@@ -58,4 +59,17 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
         userRepository.delete(user);
     }
+
+    @Override
+    public List<UserDto> getAllUsersByRole(Role role) {
+        return userRepository.findAllByRole(role).stream()
+                .map(user -> modelMapper.map(user, UserDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<UserDto> getAllStaffs() {
+        return getAllUsersByRole(Role.DELIVERY_STAFF);
+    }
+
 }

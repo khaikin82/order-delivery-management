@@ -1,17 +1,21 @@
 -- Tạo user (3 khách hàng, 3 nhân viên giao hàng, 1 admin)
 INSERT INTO users (username, password, email, phone, full_name, role) VALUES
 -- Customers
-('customer1', 'pass1', 'cus1@example.com', '0901000001', 'Nguyen Van A', 'CUSTOMER'),
-('customer2', 'pass2', 'cus2@example.com', '0901000002', 'Tran Thi B', 'CUSTOMER'),
-('customer3', 'pass3', 'cus3@example.com', '0901000003', 'Le Hoang C', 'CUSTOMER'),
+('customer', '$2a$10$7.pvhNxlffj884Xh7tUO3u53XaJHOedOvZkBEFGOrexOh3mItoDiu', 'customer@example.com', '0901000000',
+'Nguyen Van Nam', 'CUSTOMER'),
+('customer1', '$2a$10$7.pvhNxlffj884Xh7tUO3u53XaJHOedOvZkBEFGOrexOh3mItoDiu', 'cus1@example.com', '0901000001', 'Nguyen Van A', 'CUSTOMER'),
+('customer2', '$2a$10$7.pvhNxlffj884Xh7tUO3u53XaJHOedOvZkBEFGOrexOh3mItoDiu', 'cus2@example.com', '0901000002', 'Tran Thi B', 'CUSTOMER'),
+('customer3', '$2a$10$7.pvhNxlffj884Xh7tUO3u53XaJHOedOvZkBEFGOrexOh3mItoDiu', 'cus3@example.com', '0901000003', 'Le Hoang C', 'CUSTOMER'),
 
 -- Delivery Staff
-('staff1', 'staffpass1', 'staff1@example.com', '0911000001', 'Pham Van D', 'DELIVERY_STAFF'),
-('staff2', 'staffpass2', 'staff2@example.com', '0911000002', 'Hoang Thi E', 'DELIVERY_STAFF'),
-('staff3', 'staffpass3', 'staff3@example.com', '0911000003', 'Do Quang F', 'DELIVERY_STAFF'),
+('staff', '$2a$10$6XSO38dCW8j3Ltogc781DedOTNaVyg8izOUielxGijXUt4hwb/TqS', 'staff@example.com', '0911000000',
+ 'Tran Anh Tuan', 'DELIVERY_STAFF'),
+('staff1', '$2a$10$6XSO38dCW8j3Ltogc781DedOTNaVyg8izOUielxGijXUt4hwb/TqS', 'staff1@example.com', '0911000001', 'Pham Van D', 'DELIVERY_STAFF'),
+('staff2', '$2a$10$6XSO38dCW8j3Ltogc781DedOTNaVyg8izOUielxGijXUt4hwb/TqS', 'staff2@example.com', '0911000002', 'Hoang Thi E', 'DELIVERY_STAFF'),
+('staff3', '$2a$10$6XSO38dCW8j3Ltogc781DedOTNaVyg8izOUielxGijXUt4hwb/TqS', 'staff3@example.com', '0911000003', 'Do Quang F', 'DELIVERY_STAFF'),
 
 -- Admin
-('admin', 'adminpass', 'admin@example.com', '0999999999', 'Nguyen Thi G', 'ADMIN');
+('admin', '$2a$10$6xd0E0HNU2/E7xWtpdRONOpxRJTUksJGeboX7jaJct4x9eGBLARcW', 'admin@example.com', '0999999999', 'Hoang Dang Khai', 'ADMIN');
 
 
 INSERT INTO orders (

@@ -12,7 +12,9 @@ public class OrderStatusChangedEvent extends ApplicationEvent {
     private final OrderStatus newStatus;
     private final String performedBy;
 
-    public OrderStatusChangedEvent(Object source, Long orderId, OrderStatus oldStatus, OrderStatus newStatus, String performedBy) {
+    public OrderStatusChangedEvent(Object source, Long orderId, OrderStatus oldStatus,
+                                   OrderStatus newStatus,
+                                   String performedBy) {
         super(source);
         this.orderId = orderId;
         this.oldStatus = oldStatus;
