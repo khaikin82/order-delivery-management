@@ -193,12 +193,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public OrderResponse assignOrder(Long orderId, String staffUsername) {
+    public OrderResponse assignOrder(Long orderId, String staffUsername, String adminUsername) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "orderId", orderId));
 
         User staff = userRepository.findByUsername(staffUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("Staff", "username", staffUsername));
+
+        OrderStatus oldStatus = order.getStatus();
 
         order.setDeliveryStaff(staff);
         if (order.getStatus() == OrderStatus.CREATED) {
@@ -209,16 +211,22 @@ public class OrderServiceImpl implements OrderService {
         Order saved = orderRepository.save(order);
         log.info("Order with orderId {} assigned to staff {}", orderId, staffUsername);
 
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this, saved.getId(), oldStatus, saved.getStatus(), adminUsername
+        ));
+
         return mapToResponse(saved);
     }
 
     @Override
-    public OrderResponse assignOrder(String orderCode, String staffUsername) {
+    public OrderResponse assignOrder(String orderCode, String staffUsername, String adminUsername) {
         Order order = orderRepository.findByOrderCode(orderCode)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", "orderCode", orderCode));
 
         User staff = userRepository.findByUsername(staffUsername)
                 .orElseThrow(() -> new ResourceNotFoundException("Staff", "username", staffUsername));
+
+        OrderStatus oldStatus = order.getStatus();
 
         order.setDeliveryStaff(staff);
         if (order.getStatus() == OrderStatus.CREATED) {
@@ -228,6 +236,10 @@ public class OrderServiceImpl implements OrderService {
 
         Order saved = orderRepository.save(order);
         log.info("Order with orderCode {} assigned to staff {}", orderCode, staffUsername);
+
+        eventPublisher.publishEvent(new OrderStatusChangedEvent(
+                this, saved.getId(), oldStatus, saved.getStatus(), adminUsername
+        ));
 
         return mapToResponse(saved);
     }

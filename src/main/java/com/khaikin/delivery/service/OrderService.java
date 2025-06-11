@@ -32,8 +32,8 @@ public interface OrderService {
     OrderResponse getOrderByCode(String orderCode);
 
     OrderResponse createOrder(CreateOrderRequest request, String username);
-    OrderResponse assignOrder(Long orderId, String staffUsername);
-    OrderResponse assignOrder(String orderCode, String staffUsername);
+    OrderResponse assignOrder(Long orderId, String staffUsername, String adminUsername);
+    OrderResponse assignOrder(String orderCode, String staffUsername, String adminUsername);
 
     OrderResponse updateOrder(Long orderId, CreateOrderRequest request, String username);
     OrderResponse updateStatus(Long orderId, OrderStatus newStatus, String username);

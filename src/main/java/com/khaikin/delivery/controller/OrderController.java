@@ -53,7 +53,8 @@ public class OrderController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
     ) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+
         Page<OrderResponse> orderPage = orderService.getAllOrders(
                 pageable, status, hasDeliveryStaff, dateFrom, dateTo
         );
@@ -174,8 +175,10 @@ public class OrderController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> assignOrder(
             @PathVariable Long id,
-            @RequestBody AssignStaffRequest request) {
-        OrderResponse assigned = orderService.assignOrder(id, request.getStaffUsername());
+            @RequestBody AssignStaffRequest request,
+            Authentication authentication) {
+        String adminUsername = authentication.getName();
+        OrderResponse assigned = orderService.assignOrder(id, request.getStaffUsername(), adminUsername);
         return ResponseEntity.ok(assigned);
     }
 
@@ -184,8 +187,10 @@ public class OrderController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<OrderResponse> assignOrder(
             @PathVariable String orderCode,
-            @RequestBody AssignStaffRequest request) {
-        OrderResponse assigned = orderService.assignOrder(orderCode, request.getStaffUsername());
+            @RequestBody AssignStaffRequest request,
+            Authentication authentication) {
+        String adminUsername = authentication.getName();
+        OrderResponse assigned = orderService.assignOrder(orderCode, request.getStaffUsername(), adminUsername);
         return ResponseEntity.ok(assigned);
     }
 
