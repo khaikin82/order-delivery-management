@@ -22,6 +22,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.stereotype.Service;
 
@@ -44,12 +45,47 @@ public class OrderServiceImpl implements OrderService {
     private final OrderTrackingHistoryRepository historyRepository;
 
 
-    @Override
-    public Page<OrderResponse> getAllOrders(Pageable pageable) {
-        System.out.println(orderRepository.findAll(pageable));
-        return orderRepository.findAll(pageable)
-                .map(this::mapToResponse);
+//    @Override
+//    public Page<OrderResponse> getAllOrders(Pageable pageable) {
+//        System.out.println(orderRepository.findAll(pageable));
+//        return orderRepository.findAll(pageable)
+//                .map(this::mapToResponse);
+//    }
+
+    public Page<OrderResponse> getAllOrders(
+            Pageable pageable,
+            OrderStatus status,
+            Boolean hasDeliveryStaff,
+            LocalDate dateFrom,
+            LocalDate dateTo
+    ) {
+        Specification<Order> spec = (root, query, cb) -> cb.conjunction(); // tương đương với true predicate
+
+        if (status != null) {
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+        }
+
+        if (hasDeliveryStaff != null) {
+            if (hasDeliveryStaff) {
+                spec = spec.and((root, query, cb) -> cb.isNotNull(root.get("deliveryStaff")));
+            } else {
+                spec = spec.and((root, query, cb) -> cb.isNull(root.get("deliveryStaff")));
+            }
+        }
+
+        if (dateFrom != null) {
+            spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("createdAt"), dateFrom.atStartOfDay()));
+        }
+
+        if (dateTo != null) {
+            spec = spec.and((root, query, cb) -> cb.lessThan(root.get("createdAt"), dateTo.plusDays(1).atStartOfDay()));
+        }
+
+        Page<Order> orderPage = orderRepository.findAll(spec, pageable);
+        return orderPage.map(this::mapToResponse);
     }
+
+
 
     @Override
     public OrderResponse getOrderById(Long id) {
@@ -66,13 +102,63 @@ public class OrderServiceImpl implements OrderService {
     }
 
 
-    @Override
-    public Page<OrderResponse> getMyOrders(String username, Pageable pageable) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
-        Page<Order> orders = orderRepository.findByCustomer(user, pageable);
-        return orders.map(this::mapToResponse);
+//    @Override
+//    public Page<OrderResponse> getMyOrders(String username, Pageable pageable) {
+//        User user = userRepository.findByUsername(username)
+//                .orElseThrow(() -> new ResourceNotFoundException("User", "username", username));
+//        Page<Order> orders = orderRepository.findByCustomer(user, pageable);
+//        return orders.map(this::mapToResponse);
+//    }
+
+    public Page<OrderResponse> getMyOrders(
+            String username,
+            String orderCode,
+            OrderStatus status,
+            LocalDate dateFrom,
+            LocalDate dateTo,
+            Pageable pageable
+    ) {
+        Specification<Order> spec = (root, query, cb) -> cb.conjunction();
+
+        // Lọc theo username của customer
+        spec = spec.and((root, query, cb) ->
+                                cb.equal(root.get("customer").get("username"), username)
+        );
+
+        // Lọc theo mã đơn hàng
+        if (orderCode != null && !orderCode.isBlank()) {
+            spec = spec.and((root, query, cb) ->
+                                    cb.like(cb.lower(root.get("orderCode")), "%" + orderCode.toLowerCase() + "%")
+            );
+        }
+
+        // Lọc theo trạng thái
+        if (status != null) {
+            try {
+                spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+            } catch (IllegalArgumentException e) {
+                // Có thể throw custom exception nếu cần
+            }
+        }
+
+        // Lọc theo khoảng ngày tạo
+        if (dateFrom != null) {
+            spec = spec.and((root, query, cb) ->
+                                    cb.greaterThanOrEqualTo(root.get("createdAt"), dateFrom.atStartOfDay())
+            );
+        }
+
+        if (dateTo != null) {
+            spec = spec.and((root, query, cb) ->
+                                    cb.lessThan(root.get("createdAt"), dateTo.plusDays(1).atStartOfDay())
+            );
+        }
+
+        Page<Order> orderPage = orderRepository.findAll(spec, pageable);
+        return orderPage.map(this::mapToResponse);
     }
+
+
 
     @Override
     public Page<OrderResponse> getMyStaffOrders(String staffUsername, Pageable pageable) {

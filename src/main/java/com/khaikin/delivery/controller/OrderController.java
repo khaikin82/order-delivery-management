@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,6 +22,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,15 +34,32 @@ public class OrderController {
     private final OrderService orderService;
     private final TrackingService trackingService;
 
+//    @GetMapping
+//    public ResponseEntity<Page<OrderResponse>> getAllOrders(
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        Pageable pageable = PageRequest.of(page, size);
+//        Page<OrderResponse> orderPage = orderService.getAllOrders(pageable);
+//        return ResponseEntity.ok(orderPage);
+//    }
+
     @GetMapping
     public ResponseEntity<Page<OrderResponse>> getAllOrders(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) OrderStatus status,
+            @RequestParam(required = false) Boolean hasDeliveryStaff,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<OrderResponse> orderPage = orderService.getAllOrders(pageable);
+        Page<OrderResponse> orderPage = orderService.getAllOrders(
+                pageable, status, hasDeliveryStaff, dateFrom, dateTo
+        );
         return ResponseEntity.ok(orderPage);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> getOrderById(@PathVariable Long id) {
@@ -60,20 +79,40 @@ public class OrderController {
         return ResponseEntity.ok(history);
     }
 
+//    @GetMapping("/my")
+//    @PreAuthorize("isAuthenticated()")
+//    public ResponseEntity<Page<OrderResponse>> getMyOrders(
+//            Authentication authentication,
+//            @RequestParam(defaultValue = "0") int page,
+//            @RequestParam(defaultValue = "10") int size
+//    ) {
+//        String username = authentication.getName();
+//        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending()); // bạn có thể chỉnh sort theo field mong muốn
+//
+//        Page<OrderResponse> orders = orderService.getMyOrders(username, pageable);
+//
+//        return ResponseEntity.ok(orders);
+//    }
+
     @GetMapping("/my")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Page<OrderResponse>> getMyOrders(
             Authentication authentication,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String orderCode,
+            @RequestParam(required = false) OrderStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
     ) {
         String username = authentication.getName();
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending()); // bạn có thể chỉnh sort theo field mong muốn
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
-        Page<OrderResponse> orders = orderService.getMyOrders(username, pageable);
+        Page<OrderResponse> orders = orderService.getMyOrders(username, orderCode, status, dateFrom, dateTo, pageable);
 
         return ResponseEntity.ok(orders);
     }
+
 
 
     @GetMapping("/staff/my")
