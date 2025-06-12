@@ -10,12 +10,13 @@ import com.khaikin.delivery.repository.UserRepository;
 import com.khaikin.delivery.service.UserService;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -31,6 +32,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
+    @Cacheable(value = "users", key = "#userId")
     public UserDto getUserById(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
@@ -38,6 +40,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "usersByEmail", key = "#email")
     public UserDto getUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
@@ -46,6 +49,10 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#userId"),
+            @CacheEvict(value = "usersByEmail", allEntries = true)
+    })
     public UserDto updateUser(Long userId, UserUpdateDto userUpdateDto) {
         User existingUser = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "userId", userId));
@@ -55,6 +62,10 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(savedUser, UserDto.class);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "users", key = "#userId"),
+            @CacheEvict(value = "usersByEmail", allEntries = true)
+    })
     @Override
     public void deleteUserById(Long userId) {
         User user = userRepository.findById(userId)
@@ -69,7 +80,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    @Override
     public Page<UserDto> getAllStaffs(Pageable pageable) {
         return getAllUsersByRole(Role.DELIVERY_STAFF, pageable);
     }

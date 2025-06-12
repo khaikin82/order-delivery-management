@@ -54,3 +54,33 @@ CREATE TABLE order_tracking_history (
     changed_by VARCHAR(255) NOT NULL,
     CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
 );
+
+-- Nếu một cột đã là UNIQUE hoặc PRIMARY KEY, thì MySQL đã tự tạo index cho nó rồi. Ghi thêm cho rõ :v
+
+--CREATE INDEX idx_users_username ON users(username); -- đã UNIQUE, nên MySQL sẽ tạo sẵn index
+CREATE INDEX idx_users_role ON users(role); -- giúp lọc user theo vai trò, admin có dashboard để quản lý customer, staff
+CREATE INDEX idx_users_created_at ON users(created_at); -- hiển thị user theo thứ tự đc tạo gần đây nhất
+
+--CREATE INDEX idx_orders_order_code ON orders(order_code); -- đã UNIQUE, nên MySQL sẽ tạo sẵn index
+CREATE INDEX idx_orders_customer_id ON orders(customer_id); -- lọc order theo username của customer (get myOrder)
+CREATE INDEX idx_orders_staff_id ON orders(staff_id); -- lọc order theo username của staff (get myStaffOrder)
+CREATE INDEX idx_orders_status ON orders(status); -- lọc status
+CREATE INDEX idx_orders_created_at ON orders(created_at); -- hiển thị order theo thứ tự đc tạo gần đây nhất
+
+CREATE INDEX idx_tracking_order_id ON order_tracking_history(order_id); -- order_id: dùng để lấy toàn bộ lịch sử của 1 đơn hàng
+
+
+---- users
+----CREATE INDEX idx_users_username ON users(username); -- username UNIQUE, nên MySQL sẽ tạo sẵn index
+--CREATE INDEX idx_users_role ON users(role);
+--CREATE INDEX idx_users_created_at ON users(created_at);
+--
+---- orders
+----CREATE INDEX idx_orders_order_code ON orders(order_code); -- order_code UNIQUE, nên MySQL sẽ tạo sẵn index
+--CREATE INDEX idx_orders_customer_id ON orders(customer_id);
+--CREATE INDEX idx_orders_staff_id ON orders(staff_id);
+--CREATE INDEX idx_orders_status ON orders(status);
+--CREATE INDEX idx_orders_created_at ON orders(created_at);
+--
+---- order_tracking_history
+--CREATE INDEX idx_tracking_order_id ON order_tracking_history(order_id);
