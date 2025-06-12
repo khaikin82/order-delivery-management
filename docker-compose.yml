@@ -8,6 +8,7 @@ services:
     env_file: .env
     depends_on:
       - mysql
+      - redis
     networks:
       - backend
 
@@ -26,6 +27,18 @@ services:
       - backend
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    ports:
+      - "6389:6379"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5

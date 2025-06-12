@@ -39,3 +39,6 @@ src/main/resources/application-prod.yml
 
 
 /.env
+/order_tracking_history.sql
+/orders_output.sql
+/updated_orders.txt

@@ -186,7 +186,7 @@ public class OrderServiceImpl implements OrderService {
 
         Order savedOrder = orderRepository.save(order);
         log.info("Order {} created by user {}", savedOrder.getOrderCode(), username);
-//        eventPublisher.publishEvent(new OrderCreatedEvent(order.getOrderCode(), customer.getEmail()));
+        eventPublisher.publishEvent(new OrderCreatedEvent(order.getOrderCode(), customer.getEmail()));
         eventPublisher.publishEvent(new OrderStatusChangedEvent(
                 this, savedOrder.getId(), null, savedOrder.getStatus(), username
         ));
